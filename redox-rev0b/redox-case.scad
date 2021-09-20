@@ -142,9 +142,18 @@ module rev0b_bottom_case() {
                 micro_usb_hole();
                 %micro_usb_hole(hole = false);
             }
-            translate([130.5, -7.5, 0]) rotate([0, 0, -24]) {
-                mini_usb_hole();
-                %mini_usb_hole(hole = false);
+            //translate([130.5, -7.5, 0]) rotate([0, 0, -24]) {
+            //    mini_usb_hole();
+            //    %mini_usb_hole(hole = false);
+            //}
+            $fn=64;
+            translate([130.5, 7.5, 5]) rotate([90, 0, -20]) {
+                //mini_usb_hole();
+                //%mini_usb_hole(hole = false);
+                cylinder(r=7.85/2, h=20);
+                translate([0, 0, 11.5]) {
+                    cylinder(r=9.8/2, h=4);
+                }
             }
         }
     }
