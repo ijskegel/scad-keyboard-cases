@@ -159,7 +159,9 @@ module rev0b_bottom_case() {
     }
 }
 
-part = "assembly";
+//part = "assembly";
+part = "bottom0b";
+//part = "keycaps";
 explode = 1;
 if (part == "outer") {
     //BezierVisualize(bzVec);
@@ -201,6 +203,8 @@ if (part == "outer") {
         translate([0, 0, 4])
         key_holes([left_holes[0], left_holes[1], left_holes[7], left_holes[8]]);
     }
+} else if (part == "keycaps") {
+    translate([0, 0, plate_thickness + 30 * explode]) key_holes(left_keys, "keycap");
 }
 
 
