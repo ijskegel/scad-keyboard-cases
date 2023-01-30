@@ -160,8 +160,13 @@ module rev0b_bottom_case() {
 }
 
 //part = "assembly";
-part = "bottom0b";
+//part = "bottom0b";
+//part = "top0b";
+part = "top0b-raised";
 //part = "keycaps";
+//part = "outer";
+//part = "testusbhole";
+
 explode = 1;
 if (part == "outer") {
     //BezierVisualize(bzVec);
@@ -206,6 +211,24 @@ if (part == "outer") {
 } else if (part == "keycaps") {
     translate([0, 0, plate_thickness + 30 * explode]) key_holes(left_keys, "keycap");
 }
+else if (part == "testusbhole") {
+    difference() {
+        union() {
+            cube([10,20,2]);
+            cube([2,20,10]);
+        }
+        usb_c_height = 3.5;
+        usb_c_width = 9.25;
+        thickness = 10.0;
+        translate([0,10,4]) rotate(a=[0,90,0]) roundedcube([usb_c_height, usb_c_width, thickness], r=1.5, center=true, $fs=0.05);
+    }
+} else if (part == "bottom0btest") {
+    intersection() {
+        rev0b_top_case();
+        translate([-40,-30,-10]) cube([80,30,40]);
+    }
+}
+
 
 
 // Requires my utility functions in your OpenSCAD lib or as local submodule

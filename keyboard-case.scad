@@ -10,8 +10,8 @@ depth_offset = 0;       // How much of side wall to include below top plate
 
 // Case screw sizes
 standoff_rad = 7 / 2;
-screw_rad = 3.2 / 2;
-screw_head_rad = 6 / 2;
+screw_rad = 2.6 / 2;        // m2.5
+screw_head_rad = 4.5 / 2;   // m2.5
 screw_length = 8;
 bottom_screws = false; // Default is to screw down from the top
 
