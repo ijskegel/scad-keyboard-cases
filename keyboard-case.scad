@@ -10,7 +10,8 @@ depth_offset = 0;       // How much of side wall to include below top plate
 
 // Case screw sizes
 standoff_rad = 7 / 2;
-screw_rad = 2.6 / 2;        // m2.5
+screw_rad = 3.1 / 2;        // brass insert - for bottom
+//screw_rad = 2.6 / 2;        // m2.5 - use for top plate
 screw_head_rad = 4.5 / 2;   // m2.5
 screw_length = 8;
 bottom_screws = false; // Default is to screw down from the top
@@ -279,8 +280,8 @@ module bottom_case(screws, tent_positions = [], raised = false, chamfer_height =
                 translate([0, 0, -0.1]) bolthole(r1=screw_head_rad, r2=screw_rad, h1=screw_head_depth, h2=screw_length, membrane = screw_head_depth > 0 ? 0.2 : 0);
             }
         } else {
-            screw_rad = screw_rad - 0.4; // Tightened screw holes for tapping into
-            translate([0, 0, wall_thickness]) screw_positions(screws) polyhole(r = screw_rad, h = 50);
+            //screw_rad = screw_rad - 0.4; // Tightened screw holes for tapping into
+            translate([0, 0, wall_thickness]) screw_positions(screws) polyhole(r = screw_rad, h = 90);
         }
     }
 }

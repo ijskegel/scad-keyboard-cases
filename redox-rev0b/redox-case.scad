@@ -98,13 +98,13 @@ rev0b_screw_holes = [
 
     //[r0b_x5-35, r0b_y4+20],      // Bottom
     ];
-rev0b_tent_positions = [
-    // [X, Y, Angle]
-    [[0.8, -18], 180],
-    [[0.8, -91.0], 180],
-    [[146.8, -25], 5],
-    [[151.2, -117.3], -30],
-    ];
+rev0b_tent_positions = []; // no tenting holes. I'll create feet later if necessary/
+//    // [X, Y, Angle]
+//    [[0.8, -18], 180],
+//    [[0.8, -91.0], 180],
+//    [[146.8, -25], 5],
+//    [[151.2, -117.3], -30],
+//    ];
 
       /* CONTROL              POINT                       CONTROL      */
 bzVec = [                     [r0b_x1,r0b_y1],            OFFSET([30, 0]), // Top left
@@ -121,51 +121,114 @@ b1 = Bezier(bzVec, precision = bezier_precision);
 module rev0b_outer_profile() {
     offset(r = 5, chamfer = false, $fn = 20) // Purposely slightly larger than the negative offset below
     offset(r = -4.5, chamfer = false, $fn = 20)
-        polygon(b1);
+        polygon(b1);  
 }
 module rev0b_top_case(raised = true) {
     top_case(left_keys, rev0b_screw_holes, chamfer_height = raised ? 5 : 2.5, chamfer_width = 2.5, raised = raised) rev0b_outer_profile();
 }
 
+module trrs_jack() {
+    outside_dia = 10.3;
+    outside_length = 3.3;
+    inside_dia = 7.7;
+    total_length = 16.3;
+    rotate(a=[90,0,0]) translate([0,outside_dia/2,-0.27])
+    union() {
+        cylinder($fn = 180, h = total_length, d = inside_dia, center = false);
+        cylinder($fn = 180, h = outside_length, d = outside_dia, center = false);
+	intersection() {
+	    translate([0,0,outside_length+wall_thickness]) cylinder($fn = 180, h = outside_length, d = outside_dia+0.4, center = false);
+	    translate([-6,-outside_dia-3.3,0]) cube([12,10,10]);
+	}
+    }
+}
+
+module usb_c_breakout(hole=true) {
+    breakout_width = 21.8;
+    breakout_height = 1.5;
+    breakout_depth = 13.0;
+    usb_c_height = 3.5;
+    usb_c_width = 9.25;
+    usb_c_depth = 7.4;
+    usb_c_overhang = 1.5;
+    solder_height = 1.5;
+    solder_depth = 3;
+    union() {
+        color("red") translate([2, -breakout_depth, 0]) cube([breakout_width, solder_depth, solder_height]);
+        translate([2,0,solder_height]) {
+	    union() {
+            color("red") translate([0, -2, breakout_height-0.5]) rotate(a=[5,0,0]) cube([breakout_width, 2, usb_c_height + 6]);
+            color("red") translate([0, -breakout_depth, 0]) cube([breakout_width, breakout_depth, breakout_height]);
+            color("grey") translate([breakout_width/2 + usb_c_width/2, -usb_c_depth + usb_c_overhang, usb_c_height + breakout_height]) rotate(a=[0,90,90]) roundedcube([usb_c_height, usb_c_width, hole ? usb_c_depth + 3 : usb_c_depth], r=1.5, center=false, $fs=0.05);
+	    }
+        }
+    }
+}
+
+module usb_c_support() {
+    support_width = 21.8 + 4;	// 2mm extra at both sides
+    support_height = 3;	  	// breakout_height + solder_height
+    support_depth = 15;		// breakout_depth + 2mm
+    difference() {
+        translate([0, -support_depth, 0]) cube([support_width,  support_depth, support_height]);
+	usb_c_breakout();
+    }
+}
+
 module rev0b_bottom_case() {
     difference() {
-        bottom_case(rev0b_screw_holes, rev0b_tent_positions) rev0b_outer_profile();
+        union() {
+          bottom_case(rev0b_screw_holes, rev0b_tent_positions) rev0b_outer_profile();
+          translate([0, 0, wall_thickness + 0.01]) {
+              translate([32, -2.2, 0.05]) rotate([0, 0, 8.8]) usb_c_support();
+	  }
+        }
 
         translate([0, 0, wall_thickness + 0.01]) {
             // Case holes for connectors etc. The second version of each is just
             // For preview view
-            translate([34, -8.45, 0.05]) rotate([0, 0, 8.8]) {
-                reset_microswitch();
-                %reset_microswitch(hole = false);
-            }
-            translate([13, -5.5, 0]) rotate([0, 0, 4]) {
-                micro_usb_hole();
-                %micro_usb_hole(hole = false);
-            }
+	    // usb_c_hole();
+	    // %usb_c_hole();
+            translate([32, -2.2, 0.05]) rotate([0, 0, 8.8]) {
+	        usb_c_breakout();
+		%usb_c_breakout(hole=false);
+	    }
+            // translate([34, -8.45, 0.05]) rotate([0, 0, 8.8]) {
+            //     reset_microswitch();
+            //     %reset_microswitch(hole = false);
+            // }
+            // translate([13, -5.5, 0]) rotate([0, 0, 4]) {
+            //     micro_usb_hole();
+            //     %micro_usb_hole(hole = false);
+            // }
             //translate([130.5, -7.5, 0]) rotate([0, 0, -24]) {
             //    mini_usb_hole();
             //    %mini_usb_hole(hole = false);
             //}
             $fn=64;
-            translate([130.5, 7.5, 5]) rotate([90, 0, -20]) {
+            translate([130.5, -0.1, 0.2]) rotate([0, 0, -21.1]) {
                 //mini_usb_hole();
                 //%mini_usb_hole(hole = false);
-                cylinder(r=7.85/2, h=20);
-                translate([0, 0, 11.5]) {
-                    cylinder(r=9.8/2, h=4);
-                }
+                //cylinder(r=7.85/2, h=20);
+                //translate([0, 0, 11.5]) {
+                //    cylinder(r=9.8/2, h=4);
+                //}
+		trrs_jack();
+		%trrs_jack();
             }
         }
     }
 }
 
 //part = "assembly";
-//part = "bottom0b";
+part = "bottom0b";
+//part = "bottom0btest";
 //part = "top0b";
-part = "top0b-raised";
+//part = "top0b-raised";
 //part = "keycaps";
 //part = "outer";
-//part = "testusbhole";
+//part = "usb_c_breakout";
+//part = "trrs_jack";
 
 explode = 1;
 if (part == "outer") {
@@ -210,8 +273,13 @@ if (part == "outer") {
     }
 } else if (part == "keycaps") {
     translate([0, 0, plate_thickness + 30 * explode]) key_holes(left_keys, "keycap");
-}
-else if (part == "testusbhole") {
+} else if (part == "usb_c_breakout") {
+    $fn=64;
+    usb_c_support(); 
+    %usb_c_breakout();
+} else if (part == "trrs_jack") {
+    trrs_jack();
+} else if (part == "testusbhole") {
     difference() {
         union() {
             cube([10,20,2]);
@@ -224,8 +292,9 @@ else if (part == "testusbhole") {
     }
 } else if (part == "bottom0btest") {
     intersection() {
-        rev0b_top_case();
-        translate([-40,-30,-10]) cube([80,30,40]);
+        rev0b_bottom_case();
+       // rev0b_top_case();
+        translate([110,-45,-10]) cube([42,80,40]);
     }
 }
 
